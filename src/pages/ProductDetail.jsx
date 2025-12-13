@@ -171,7 +171,7 @@ const ProductDetail = () => {
                 </div>
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '2rem' }}>
+            <div className="product-detail-grid">
                 <div>
                     <div style={{ marginBottom: '1rem' }}>
                         <h1 style={{ marginBottom: '0.5rem' }}>{product.name}</h1>

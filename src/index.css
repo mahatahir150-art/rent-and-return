@@ -548,14 +548,79 @@ label,
   color: var(--primary);
 }
 
-.distance-badge {
+
+/* Responsive Design Media Queries */
+
+@media (max-width: 768px) {
+  :root {
+    --radius-lg: 16px;
+  }
+
+  /* Typography Scaling */
+  html {
+    font-size: 14px;
+    /* Scale down base size */
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    /* Down from 3.5rem */
+  }
+
+  h2 {
+    font-size: 2rem;
+    /* Down from 2.5rem */
+  }
+
+  h3 {
+    font-size: 1.5rem;
+  }
+
+  /* Layout Adjustments */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  /* Product Grid Fix for small screens */
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  .glass-card {
+    padding: 1rem !important;
+    /* Force smaller padding on cards */
+  }
+
+  /* Ensure inputs don't zoom on iOS */
+  input,
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* Utility to hide/show on mobile */
+.desktop-only {
   display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  background: #f1f5f9;
-  padding: 0.35rem 0.6rem;
-  border-radius: 6px;
-  color: #64748b;
-  font-size: 0.75rem;
-  font-weight: 600;
+}
+
+.mobile-only {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: flex;
+  }
 }

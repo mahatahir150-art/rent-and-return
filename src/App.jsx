@@ -16,10 +16,15 @@ const NotFound = () => <div className="container" style={{ padding: '2rem' }}><h
 
 function App() {
   console.log("App.jsx: Rendering..."); // DEBUG
-  const [isLoading, setIsLoading] = useState(false); // DISABLED FOR DEBUGGING
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Splash screen disabled
+    // Simulate initial loading (e.g. auth check, assets)
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 2000); // 2 seconds splash screen
+
+    return () => clearTimeout(timer);
   }, []);
 
   if (isLoading) {
@@ -30,19 +35,27 @@ function App() {
     <Router>
       <div className="app-container">
         <Toaster
-          position="top-center"
+          position="bottom-center"
           toastOptions={{
             style: {
-              background: '#800000',
-              color: '#fff',
-              border: '1px solid #d4a017',
+              background: '#ffffff',
+              color: '#800000',
+              border: '1px solid #800000',
+              padding: '16px',
+              fontWeight: 'bold',
             },
             success: {
               iconTheme: {
-                primary: '#d4a017',
-                secondary: '#800000',
+                primary: '#800000',
+                secondary: '#ffffff',
               },
             },
+            error: {
+              iconTheme: {
+                primary: '#ef4444',
+                secondary: '#ffffff',
+              }
+            }
           }}
         />
         { /* TEST RENDER */}

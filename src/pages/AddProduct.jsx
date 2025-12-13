@@ -194,7 +194,7 @@ const AddProduct = () => {
                         </label>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div className="form-grid">
                         <Input
                             id="name"
                             label="Product Name"
@@ -236,7 +236,7 @@ const AddProduct = () => {
                         </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div className="form-grid">
                         <div style={{ position: 'relative' }}>
                             <Input
                                 id="price"
@@ -282,7 +282,7 @@ const AddProduct = () => {
                         />
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.5rem', marginBottom: '1.5rem' }}>
+                    <div className="form-grid">
                         <div>
                             <label>
                                 Condition

@@ -1,14 +1,12 @@
-// Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAnalytics } from "firebase/analytics";
+// import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+// import { getFirestore } from "firebase/firestore";
 import { getDatabase } from "firebase/database";
-import { getStorage } from "firebase/storage";
-import { getMessaging, isSupported } from "firebase/messaging";
+// import { getStorage } from "firebase/storage";
+// import { getMessaging, isSupported } from "firebase/messaging";
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
     apiKey: "AIzaSyCkYfusJfqzlXBugzu6pBgflxXAKcZfz9U",
     authDomain: "rent-return.firebaseapp.com",
@@ -22,36 +20,45 @@ const firebaseConfig = {
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+// const app = null;
 
-// Initialize Firebase services
 // Initialize Firebase services
 let analytics = null;
 let auth = null;
 let firestoreDb = null;
 let realtimeDb = null;
 let storage = null;
+let messaging = null;
 
+/* 
+// TEMPORARILY DISABLED FOR DEBUGGING & UNUSED SERVICES
 try {
     analytics = getAnalytics(app);
 } catch (e) { console.error("Firebase Analytics failed", e); }
+*/
 
 try {
     auth = getAuth(app);
 } catch (e) { console.error("Firebase Auth failed", e); }
 
+/*
 try {
     firestoreDb = getFirestore(app);
 } catch (e) { console.error("Firebase Firestore failed", e); }
+*/
 
 try {
     realtimeDb = getDatabase(app);
 } catch (e) { console.error("Firebase RealTime DB failed", e); }
 
+/*
+// User switched to Cloudinary, disabling Firebase Storage
 try {
     storage = getStorage(app);
 } catch (e) { console.error("Firebase Storage failed", e); }
+*/
 
-let messaging = null;
+/*
 isSupported().then(supported => {
     if (supported) {
         messaging = getMessaging(app);
@@ -59,7 +66,7 @@ isSupported().then(supported => {
 }).catch(err => {
     console.log('Firebase Messaging not supported in this environment', err);
 });
-
+*/
 
 // Export Firebase services for use in other parts of the app
 export { app, analytics, auth, firestoreDb, realtimeDb, storage, messaging };

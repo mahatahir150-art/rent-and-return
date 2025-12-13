@@ -3,29 +3,29 @@ import Sidebar from '../components/Sidebar';
 import SearchBar from '../components/SearchBar';
 import { Plus, Menu } from 'lucide-react';
 import Button from '../components/Button';
-
 import ProductList from '../components/ProductList';
-import AddProduct from './AddProduct';
-import ProductDetail from './ProductDetail';
-import TrackProduct from './TrackProduct';
-import Profile from './Profile';
-import Notifications from './Notifications';
-import Bank from './Bank';
-import BankingSetup from './BankingSetup';
+import { useState, useEffect, Suspense, lazy } from 'react';
 
-import { useState } from 'react';
+// Lazy Load Pages - Commented out for binary search
+// Lazy Load Pages
+const AddProduct = lazy(() => import('./AddProduct'));
+const ProductDetail = lazy(() => import('./ProductDetail'));
+const TrackProduct = lazy(() => import('./TrackProduct'));
+const Profile = lazy(() => import('./Profile'));
+const Notifications = lazy(() => import('./Notifications'));
+const Bank = lazy(() => import('./Bank'));
+const BankingSetup = lazy(() => import('./BankingSetup'));
+const MyRentals = lazy(() => import('./MyRentals'));
+const MyListings = lazy(() => import('./MyListings'));
+const HelpSupport = lazy(() => import('./HelpSupport'));
 
-import MyRentals from './MyRentals';
-import MyListings from './MyListings';
-import HelpSupport from './HelpSupport';
-
+// Placeholder Pages - Adjusted to remove internal Headers
 // Placeholder Pages - Adjusted to remove internal Headers
 const Home = () => {
     const [searchQuery, setSearchQuery] = useState('');
 
     return (
         <div>
-            {/* Header moved to Dashboard */}
             <SearchBar onSearch={setSearchQuery} />
             <ProductList searchQuery={searchQuery} />
         </div>
@@ -33,8 +33,21 @@ const Home = () => {
 };
 
 const Dashboard = () => {
-    const [isSidebarOpen, setIsSidebarOpen] = useState(true);
+    const [isSidebarOpen, setIsSidebarOpen] = useState(window.innerWidth > 768);
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
     const location = useLocation();
+
+    useEffect(() => {
+        const handleResize = () => {
+            const mobile = window.innerWidth <= 768;
+            setIsMobile(mobile);
+            if (mobile) setIsSidebarOpen(false);
+            else setIsSidebarOpen(true);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     // Mapping paths to titles
     const getPageTitle = (pathname) => {
@@ -42,7 +55,7 @@ const Dashboard = () => {
         if (pathname.includes('/add-product')) return 'Add New Product';
         if (pathname.includes('/track')) return 'Track Product';
         if (pathname.includes('/rentals')) return 'My Rentals';
-        if (pathname.includes('/listed')) return 'My Listings';
+        if (pathname.includes('/listed')) return 'My Listed Products';
         if (pathname.includes('/notifications')) return 'Notifications';
         if (pathname.includes('/bank')) return 'Digital Bank';
         if (pathname.includes('/banking-setup')) return 'Banking Setup';
@@ -57,15 +70,34 @@ const Dashboard = () => {
 
     return (
         <div style={{ display: 'flex', height: '100vh', flexDirection: 'row', overflow: 'hidden' }}>
+            {/* Mobile Overlay Backdrop */}
+            {isMobile && isSidebarOpen && (
+                <div
+                    onClick={() => setIsSidebarOpen(false)}
+                    style={{
+                        position: 'fixed',
+                        inset: 0,
+                        background: 'rgba(0,0,0,0.5)',
+                        zIndex: 40,
+                        backdropFilter: 'blur(4px)'
+                    }}
+                />
+            )}
+
             {/* Sidebar Container */}
             <div style={{
-                width: isSidebarOpen ? '260px' : '0px',
-                flexShrink: 0,
-                transition: 'width 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
-                overflow: 'hidden',
-                borderRight: isSidebarOpen ? 'none' : '1px solid transparent'
+                position: isMobile ? 'fixed' : 'relative',
+                top: 0,
+                left: 0,
+                height: '100%',
+                width: '260px',
+                zIndex: 50,
+                transform: isSidebarOpen ? 'translateX(0)' : 'translateX(-100%)',
+                transition: 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                marginRight: isMobile ? 0 : (isSidebarOpen ? 0 : '-260px'), // Negative margin to collapse space on desktop
+                flexShrink: 0
             }}>
-                <div style={{ width: '260px', height: '100%' }}>
+                <div style={{ width: '260px', height: '100%', background: 'var(--bg-main)' }}>
                     <Sidebar />
                 </div>
             </div>
@@ -73,13 +105,13 @@ const Dashboard = () => {
             {/* Main Content */}
             <main style={{
                 flex: 1,
-                padding: '2rem',
+                padding: isMobile ? '1rem' : '2rem',
                 backgroundColor: 'var(--bg-main)',
-                marginLeft: '0',
                 overflowY: 'auto',
-                position: 'relative'
+                position: 'relative',
+                width: '100%'
             }}>
-                <div className="container" style={{ maxWidth: '1600px', margin: '0 auto' }}>
+                <div className="container" style={{ maxWidth: '1600px', margin: '0 auto', paddingBottom: '80px' }}>
 
                     {/* Header Bar: Toggle + Centered Title */}
                     <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center' }}>
@@ -88,28 +120,27 @@ const Dashboard = () => {
                             <button
                                 onClick={() => setIsSidebarOpen(!isSidebarOpen)}
                                 style={{
-                                    background: 'transparent',
-                                    border: 'none',
+                                    background: 'white',
+                                    border: '1px solid #e2e8f0',
                                     cursor: 'pointer',
                                     padding: '0.5rem',
-                                    borderRadius: '50%',
+                                    borderRadius: '8px',
                                     display: 'flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
                                     color: 'var(--text-main)',
-                                    transition: 'background 0.2s'
+                                    transition: 'all 0.2s',
+                                    boxShadow: 'var(--shadow-sm)'
                                 }}
-                                onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(0,0,0,0.05)'}
-                                onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
                             >
-                                <Menu size={28} />
+                                <Menu size={24} />
                             </button>
                         </div>
 
                         {/* Center: Title */}
                         <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
                             <h1 style={{
-                                fontSize: '2.5rem',
+                                fontSize: isMobile ? '1.5rem' : '2.5rem',
                                 margin: 0,
                                 textAlign: 'center',
                                 color: 'var(--primary)',
@@ -119,26 +150,29 @@ const Dashboard = () => {
                             </h1>
                         </div>
 
-                        {/* Right: Spacer to balance Hamburger (optional, improves true centering) */}
+                        {/* Right: Spacer to balance Hamburger */}
                         <div style={{ flex: '0 0 40px' }}></div>
                     </div>
 
-                    <Routes>
-                        <Route index element={<Navigate to="/dashboard/home" replace />} />
-                        <Route path="home" element={<Home />} />
-                        <Route path="add-product" element={<AddProduct />} />
-                        <Route path="product/:id" element={<ProductDetail />} />
-                        <Route path="track" element={<TrackProduct />} />
-                        <Route path="rentals" element={<MyRentals />} />
-                        <Route path="listed" element={<MyListings />} />
-                        <Route path="notifications" element={<Notifications />} />
-                        <Route path="bank" element={<Bank />} />
-                        <Route path="banking-setup" element={<BankingSetup />} />
-                        <Route path="profile" element={<Profile />} />
-                        <Route path="settings" element={<Profile />} />
-                        <Route path="help" element={<HelpSupport />} />
-                        <Route path="*" element={<div>Route Not Found: {window.location.pathname}</div>} />
-                    </Routes>
+                    <Suspense fallback={<div style={{ padding: '2rem', textAlign: 'center' }}>Loading...</div>}>
+                        <Routes>
+                            <Route index element={<Navigate to="/dashboard/home" replace />} />
+                            <Route path="home" element={<Home />} />
+                            <Route path="add-product" element={<AddProduct />} />
+                            <Route path="product/:id" element={<ProductDetail />} />
+                            <Route path="track" element={<TrackProduct />} />
+                            <Route path="rentals" element={<MyRentals />} />
+                            <Route path="listed" element={<MyListings />} />
+                            <Route path="notifications" element={<Notifications />} />
+                            <Route path="bank" element={<Bank />} />
+                            <Route path="banking-setup" element={<BankingSetup />} />
+                            <Route path="profile" element={<Profile />} />
+                            <Route path="settings" element={<Profile />} />
+                            <Route path="help" element={<HelpSupport />} />
+                            <Route path="*" element={<div>Route Not Found: {window.location.pathname}</div>} />
+                        </Routes>
+                    </Suspense>
+
                 </div>
             </main>
         </div>
@@ -146,5 +180,3 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
-
-// Re-forcing module load

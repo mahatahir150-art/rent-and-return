@@ -89,15 +89,7 @@ const LandingPage = () => {
                     THE FUTURE OF RENTING
                 </div>
 
-                <h1 className="animate-slide-up" style={{
-                    fontSize: '4.5rem',
-                    fontWeight: '800',
-                    marginBottom: '1.5rem',
-                    lineHeight: '1.1',
-                    letterSpacing: '-0.02em',
-                    maxWidth: '1000px',
-                    color: 'var(--primary)'
-                }}>
+                <h1 className="animate-slide-up hero-title">
                     Rent Anything, <br />
                     <span style={{ color: 'var(--secondary)', position: 'relative', display: 'inline-block' }}>
                         Anywhere.
@@ -107,7 +99,7 @@ const LandingPage = () => {
                     </span>
                 </h1>
 
-                <p className="animate-slide-up-delay" style={{
+                <p className="animate-slide-up-delay hero-subtitle" style={{
                     fontSize: '1.25rem',
                     color: 'var(--text-muted)',
                     marginBottom: '3rem',
@@ -118,7 +110,7 @@ const LandingPage = () => {
                     From high-end cameras to luxury cars, rent verified items securely.
                 </p>
 
-                <div className="animate-slide-up-delay" style={{ animationDelay: '0.4s', display: 'flex', gap: '1.5rem' }}>
+                <div className="animate-slide-up-delay hero-buttons" style={{ animationDelay: '0.4s', display: 'flex', gap: '1.5rem' }}>
                     <Button
                         onClick={() => navigate('/signup')}
                         style={{
@@ -158,25 +150,7 @@ const LandingPage = () => {
                     }} />
 
                     {/* Floating Badge Right */}
-                    <div className="glass-card animate-float" style={{
-                        position: 'absolute',
-                        top: '30%',
-                        right: '10%',
-                        padding: '1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '1rem',
-                        background: 'white',
-                        animationDelay: '1s'
-                    }}>
-                        <div style={{ background: '#fef3c7', padding: '0.5rem', borderRadius: '50%' }}>
-                            <Star size={20} color="#d97706" fill="#d97706" />
-                        </div>
-                        <div>
-                            <div style={{ fontWeight: 'bold', color: 'var(--text-main)' }}>Trusted by 500+</div>
-                            <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Verified Owners</div>
-                        </div>
-                    </div>
+
                 </div>
             </main>
 
