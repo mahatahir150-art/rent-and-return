@@ -1,76 +1,88 @@
-import { NavLink } from 'react-router-dom';
-import { Home, Search, Package, Bell, HelpCircle, Settings, LogOut, LayoutDashboard } from 'lucide-react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { Home, Search, Package, Bell, HelpCircle, LogOut, LayoutDashboard, PlusCircle, CreditCard, User } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 const Sidebar = () => {
+    const navigate = useNavigate();
     const menuItems = [
+        { icon: User, label: 'Profile', path: '/dashboard/profile' },
         { icon: Home, label: 'Home', path: '/dashboard/home' },
+        { icon: PlusCircle, label: 'Add Product', path: '/dashboard/add-product' },
         { icon: Search, label: 'Track My Product', path: '/dashboard/track' },
         { icon: Package, label: 'My Rentals', path: '/dashboard/rentals' },
         { icon: LayoutDashboard, label: 'My Listed Products', path: '/dashboard/listed' },
+        { icon: CreditCard, label: 'Digital Bank', path: '/dashboard/bank' },
         { icon: Bell, label: 'Notifications', path: '/dashboard/notifications' },
         { icon: HelpCircle, label: 'Help & Support', path: '/dashboard/help' },
-        { icon: Settings, label: 'Settings', path: '/dashboard/settings' },
     ];
 
+    const handleLogout = async () => {
+        try {
+            const { signOut } = await import('firebase/auth');
+            const { auth } = await import('../config/firebase');
+            await signOut(auth);
+            navigate('/login');
+        } catch (error) {
+            console.error("Logout Error:", error);
+        }
+    };
+
     return (
-        <aside style={{
-            width: '260px',
-            height: '100vh',
-            backgroundColor: 'var(--bg-card)',
-            borderRight: '1px solid #e2e8f0',
-            display: 'flex',
-            flexDirection: 'column',
-            position: 'fixed',
-            left: 0,
-            top: 0,
-            zIndex: 10
-        }}>
-            <div style={{ padding: '2rem', borderBottom: '1px solid #e2e8f0' }}>
-                <h2 style={{ color: 'var(--primary)', fontSize: '1.5rem', fontWeight: 'bold' }}>Rent & Return</h2>
+        <aside className="sidebar-container glass-panel">
+            {/* Logo Section */}
+            <div className="sidebar-header">
+                <div className="logo-icon">
+                    RR
+                </div>
+                <h2 className="app-title text-gradient">
+                    RentReturn
+                </h2>
             </div>
 
-            <nav style={{ flex: 1, padding: '1rem', overflowY: 'auto' }}>
+            {/* Navigation */}
+            <nav className="sidebar-nav custom-scrollbar">
                 {menuItems.map((item) => (
                     <NavLink
                         key={item.label}
                         to={item.path}
                         className={({ isActive }) =>
-                            isActive ? 'sidebar-link active' : 'sidebar-link'
+                            `sidebar-link ${isActive ? 'active' : ''}`
                         }
-                        style={({ isActive }) => ({
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '0.75rem',
-                            padding: '0.875rem 1rem',
-                            borderRadius: 'var(--radius-md)',
-                            color: isActive ? 'var(--primary)' : 'var(--text-muted)',
-                            backgroundColor: isActive ? 'rgba(79, 70, 229, 0.05)' : 'transparent',
-                            textDecoration: 'none',
-                            marginBottom: '0.5rem',
-                            fontWeight: isActive ? 600 : 500,
-                            transition: 'all 0.2s ease'
-                        })}
                     >
-                        <item.icon size={20} />
-                        <span>{item.label}</span>
+                        {({ isActive }) => (
+                            <>
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="activeTab"
+                                        className="active-tab-bg"
+                                        initial={false}
+                                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                                    />
+                                )}
+                                <item.icon
+                                    size={20}
+                                    className="sidebar-icon"
+                                    color={isActive ? 'var(--primary)' : '#64748b'}
+                                />
+                                <span className="sidebar-label">{item.label}</span>
+                                {isActive && (
+                                    <motion.div
+                                        layoutId="activeIndicator"
+                                        className="active-dot"
+                                    />
+                                )}
+                            </>
+                        )}
                     </NavLink>
                 ))}
             </nav>
 
-            <div style={{ padding: '1rem', borderTop: '1px solid #e2e8f0' }}>
-                <button style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.75rem',
-                    padding: '0.875rem 1rem',
-                    width: '100%',
-                    border: 'none',
-                    background: 'transparent',
-                    color: 'var(--error)',
-                    cursor: 'pointer',
-                    borderRadius: 'var(--radius-md)',
-                    fontWeight: 600
-                }}>
+            {/* Logout */}
+            <div className="sidebar-footer">
+                <button
+                    onClick={handleLogout}
+                    className="logout-btn"
+                >
                     <LogOut size={20} />
                     <span>Logout</span>
                 </button>
@@ -78,5 +90,4 @@ const Sidebar = () => {
         </aside>
     );
 };
-
 export default Sidebar;

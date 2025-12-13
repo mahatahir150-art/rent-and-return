@@ -1,63 +1,56 @@
+import { useState, useEffect } from 'react';
 import ProductCard from './ProductCard';
+import { realtimeDb as db } from '../config/firebase';
+import { ref, onValue } from 'firebase/database';
 
-const ProductList = () => {
-    // Mock Data
-    const products = [
-        {
-            id: 1,
-            name: 'DSLR Camera',
-            price: 50,
-            rating: 4.8,
-            distance: '1.2 km',
-            description: 'Professional Canon DSLR with 18-55mm lens. Perfect for photography enthusiasts.',
-            image: 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=500&q=80'
-        },
-        {
-            id: 2,
-            name: 'Electric Scooter',
-            price: 25,
-            rating: 4.5,
-            distance: '0.5 km',
-            description: 'Xiaomi M365 electric scooter. Great for city commute.',
-            image: 'https://images.unsplash.com/photo-1558981403-c5f9899a28bc?auto=format&fit=crop&w=500&q=80'
-        },
-        {
-            id: 3,
-            name: 'Camping Tent',
-            price: 30,
-            rating: 4.9,
-            distance: '3.0 km',
-            description: '4-person waterproof camping tent. Easy to set up.',
-            image: 'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?auto=format&fit=crop&w=500&q=80'
-        },
-        {
-            id: 4,
-            name: 'Gaming Console',
-            price: 40,
-            rating: 4.7,
-            distance: '2.5 km',
-            description: 'PlayStation 5 with 2 controllers and 5 games.',
-            image: 'https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?auto=format&fit=crop&w=500&q=80'
-        },
-        {
-            id: 5,
-            name: 'Drill Machine',
-            price: 15,
-            rating: 4.2,
-            distance: '0.8 km',
-            description: 'Cordless power drill with full bit set.',
-            image: 'https://images.unsplash.com/photo-1504148455328-c376907d081c?auto=format&fit=crop&w=500&q=80'
-        },
-        {
-            id: 6,
-            name: 'Mountain Bike',
-            price: 35,
-            rating: 4.6,
-            distance: '1.5 km',
-            description: 'Trek mountain bike with suspension. Helmet included.',
-            image: 'https://images.unsplash.com/photo-1532298229144-0ec0c57515c7?auto=format&fit=crop&w=500&q=80'
-        }
-    ];
+const ProductList = ({ searchQuery = '' }) => {
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const productsRef = ref(db, 'products');
+        const unsubscribe = onValue(productsRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const productList = Object.keys(data).map(key => ({
+                    id: key,
+                    ...data[key]
+                }));
+                // Filter out deleted or invalid items if necessary
+                setProducts(productList.reverse()); // Show newest first
+            } else {
+                setProducts([]);
+            }
+            setLoading(false);
+        }, (error) => {
+            console.error("Error fetching products:", error);
+            setLoading(false);
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    const filteredProducts = products.filter(product => {
+        const query = searchQuery.toLowerCase();
+        return (
+            product.name?.toLowerCase().includes(query) ||
+            product.description?.toLowerCase().includes(query) ||
+            product.location?.toLowerCase().includes(query) ||
+            product.category?.toLowerCase().includes(query)
+        );
+    });
+
+    if (loading) {
+        return <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--text-muted)' }}>Loading products...</div>;
+    }
+
+    if (filteredProducts.length === 0) {
+        return (
+            <div style={{ textAlign: 'center', padding: '4rem', color: 'var(--text-muted)' }}>
+                <p style={{ fontSize: '1.1rem' }}>No products found matching "{searchQuery}"</p>
+            </div>
+        );
+    }
 
     return (
         <div style={{
@@ -66,7 +59,7 @@ const ProductList = () => {
             gap: '1.5rem',
             paddingBottom: '2rem'
         }}>
-            {products.map(product => (
+            {filteredProducts.map(product => (
                 <ProductCard key={product.id} product={product} />
             ))}
         </div>

@@ -1,10 +1,52 @@
 import { useState } from 'react';
-import { Search, Filter, MapPin } from 'lucide-react';
+import { Search, Filter, MapPin, Loader } from 'lucide-react';
 import Button from './Button';
+import { getLocationWithAddress } from '../utils/locationUtils';
+import toast from 'react-hot-toast';
 
-const SearchBar = () => {
-    const [searchQuery, setSearchQuery] = useState('');
+const SearchBar = ({ onSearch }) => {
+    const [localQuery, setLocalQuery] = useState('');
     const [showFilters, setShowFilters] = useState(false);
+    const [loadingLocation, setLoadingLocation] = useState(false);
+
+    const handleSearch = () => {
+        onSearch(localQuery);
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter') {
+            handleSearch();
+        }
+    };
+
+    const handleNearMe = async () => {
+        setLoadingLocation(true);
+        try {
+            const locationData = await getLocationWithAddress();
+            console.log("Location found:", locationData);
+
+            // Prioritize Suburb/Neighborhood for better local relevance, fallback to City
+            const specificLocation = locationData.suburb || locationData.city || locationData.town || '';
+            const broaderLocation = locationData.city || locationData.state || '';
+
+            // Construct search query
+            const locationString = specificLocation ? `${specificLocation}, ${broaderLocation}` : broaderLocation;
+
+            if (locationString) {
+                setLocalQuery(locationString);
+                onSearch(locationString); // Filter by this location string
+                toast.success(`Location set to: ${locationString}`);
+            } else {
+                toast.error("Could not determine a specific city or area from your location.");
+            }
+
+        } catch (error) {
+            console.error("Error getting location:", error);
+            toast.error(error.message || "Failed to get location. Please ensure location services are enabled.");
+        } finally {
+            setLoadingLocation(false);
+        }
+    };
 
     return (
         <div style={{
@@ -15,40 +57,49 @@ const SearchBar = () => {
             marginBottom: '2rem'
         }}>
             <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-                <div style={{ flex: 1, position: 'relative' }}>
-                    <Search style={{
-                        position: 'absolute',
-                        left: '1rem',
-                        top: '50%',
-                        transform: 'translateY(-50%)',
-                        color: 'var(--text-muted)'
-                    }} size={20} />
-                    <input
-                        type="text"
-                        placeholder="Search for products..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        style={{
-                            width: '100%',
-                            padding: '0.75rem 1rem 0.75rem 2.875rem',
-                            border: '2px solid #e2e8f0',
-                            borderRadius: 'var(--radius-md)',
-                            fontSize: '1rem',
-                            outline: 'none',
-                            transition: 'border-color 0.2s'
-                        }}
-                        onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
-                        onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
-                    />
-                </div>
+                {/* Filter Button (Left - Small) */}
                 <Button
-                    variant={showFilters ? 'primary' : 'outline'}
+                    variant="primary"
                     onClick={() => setShowFilters(!showFilters)}
-                    style={{ width: 'auto' }}
-                    icon={Filter}
+                    style={{
+                        width: '48px',
+                        padding: '0',
+                        flexShrink: 0,
+                        height: '42px', // Match other inputs
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        background: showFilters ? 'var(--primary-hover)' : 'var(--primary)', // Solid maroon always, darker when active
+                    }}
+                    title="Filters"
                 >
-                    Filters
+                    <Filter size={20} />
                 </Button>
+
+                {/* Search Input (Rest of Width) */}
+                <input
+                    type="text"
+                    placeholder="Search query or 'Location'"
+                    value={localQuery}
+                    onChange={(e) => {
+                        setLocalQuery(e.target.value);
+                        onSearch(e.target.value);
+                    }}
+                    onKeyDown={handleKeyDown}
+                    style={{
+                        flex: 1,
+                        padding: '0 1rem',
+                        height: '48px',
+                        border: '2px solid #e2e8f0',
+                        borderRadius: 'var(--radius-md)',
+                        fontSize: '1rem',
+                        outline: 'none',
+                        transition: 'border-color 0.2s',
+                        backgroundColor: 'white'
+                    }}
+                    onFocus={(e) => e.target.style.borderColor = 'var(--primary)'}
+                    onBlur={(e) => e.target.style.borderColor = '#e2e8f0'}
+                />
             </div>
 
             {showFilters && (
@@ -56,13 +107,16 @@ const SearchBar = () => {
                     marginTop: '1rem',
                     paddingTop: '1rem',
                     borderTop: '1px solid #e2e8f0',
-                    display: 'grid',
-                    gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))',
-                    gap: '1rem'
+                    display: 'flex',
+                    alignItems: 'flex-end',
+                    gap: '1rem',
+                    flexWrap: 'nowrap',
+                    overflowX: 'auto',
+                    paddingBottom: '0.5rem' // Scroll space
                 }}>
-                    <div>
+                    <div style={{ flex: 1, minWidth: '150px' }}>
                         <label className="label">Category</label>
-                        <select className="input-field" style={{ padding: '0.5rem' }}>
+                        <select className="input-field" style={{ padding: '0.5rem', width: '100%', height: '42px' }}>
                             <option>All</option>
                             <option>Electronics</option>
                             <option>Furniture</option>
@@ -70,34 +124,40 @@ const SearchBar = () => {
                             <option>Vehicles</option>
                         </select>
                     </div>
-                    <div>
+                    <div style={{ flex: 1, minWidth: '150px' }}>
                         <label className="label">Price Range</label>
-                        <select className="input-field" style={{ padding: '0.5rem' }}>
+                        <select className="input-field" style={{ padding: '0.5rem', width: '100%', height: '42px' }}>
                             <option>Any</option>
-                            <option>$0 - $50</option>
-                            <option>$50 - $200</option>
-                            <option>$200+</option>
+                            <option>PKR 0 - PKR 5000</option>
+                            <option>PKR 5000 - PKR 10000</option>
+                            <option>PKR 10000+</option>
                         </select>
                     </div>
-                    <div>
+                    <div style={{ flex: 1, minWidth: '150px' }}>
                         <label className="label">Availability</label>
-                        <select className="input-field" style={{ padding: '0.5rem' }}>
+                        <select className="input-field" style={{ padding: '0.5rem', width: '100%', height: '42px' }}>
                             <option>Any</option>
                             <option>Available Now</option>
                             <option>This Weekend</option>
                         </select>
                     </div>
-                    <div>
+                    <div style={{ flex: 1, minWidth: '150px' }}>
                         <label className="label">Rating</label>
-                        <select className="input-field" style={{ padding: '0.5rem' }}>
+                        <select className="input-field" style={{ padding: '0.5rem', width: '100%', height: '42px' }}>
                             <option>Any</option>
                             <option>4+ Stars</option>
                             <option>3+ Stars</option>
                         </select>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'flex-end' }}>
-                        <Button variant="outline" icon={MapPin} style={{ width: '100%', padding: '0.625rem' }}>
-                            Near Me
+                    <div style={{ flex: 1, minWidth: '150px' }}>
+                        <Button
+                            variant="outline"
+                            icon={loadingLocation ? Loader : MapPin}
+                            onClick={handleNearMe}
+                            style={{ width: '100%', height: '42px', padding: '0.625rem' }}
+                            disabled={loadingLocation}
+                        >
+                            {loadingLocation ? "Locating..." : "Near Me"}
                         </Button>
                     </div>
                 </div>

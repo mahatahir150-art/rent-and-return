@@ -5,7 +5,9 @@ const Button = ({
     onClick,
     type = 'button',
     disabled = false,
-    icon: Icon
+    icon: Icon,
+    fullWidth = false,
+    style = {}
 }) => {
     const baseClass = 'btn';
     const variantClass = variant === 'outline' ? 'btn-outline' : 'btn-primary';
@@ -16,7 +18,10 @@ const Button = ({
             className={`${baseClass} ${variantClass} ${className}`}
             onClick={onClick}
             disabled={disabled}
-            style={{ opacity: disabled ? 0.7 : 1, width: '100%' }}
+            style={{
+                width: fullWidth ? '100%' : 'auto',
+                ...style
+            }}
         >
             {Icon && <Icon size={20} />}
             {children}

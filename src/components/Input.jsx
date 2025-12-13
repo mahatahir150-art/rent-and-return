@@ -10,19 +10,32 @@ const Input = ({
     icon: Icon
 }) => {
     const [isFocused, setIsFocused] = useState(false);
-    const hasValue = value && value.length > 0;
 
     return (
-        <div className="input-group">
+        <div className="input-group" style={{ marginBottom: '1.5rem', position: 'relative' }}>
+            {label && (
+                <label
+                    htmlFor={id}
+                    style={{
+                        display: 'block',
+                        marginBottom: '0.5rem',
+                        color: 'var(--text-muted)',
+                        fontWeight: '500',
+                        fontSize: '0.9rem'
+                    }}
+                >
+                    {label} {required && <span style={{ color: 'var(--error)' }}>*</span>}
+                </label>
+            )}
             <div style={{ position: 'relative' }}>
                 {Icon && (
                     <div style={{
                         position: 'absolute',
-                        left: '12px',
+                        left: '16px', // Adjusted for larger radius/padding
                         top: '50%',
                         transform: 'translateY(-50%)',
-                        color: 'var(--text-muted)',
-                        zIndex: 1
+                        color: isFocused ? 'var(--primary)' : '#9ca3af',
+                        pointerEvents: 'none'
                     }}>
                         <Icon size={20} />
                     </div>
@@ -34,30 +47,20 @@ const Input = ({
                     onChange={onChange}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
-                    className="input-field"
                     required={required}
-                    style={{ paddingLeft: Icon ? '40px' : '1rem' }}
+                    style={{
+                        width: '100%',
+                        padding: Icon ? '0.875rem 0.875rem 0.875rem 3rem' : '0.875rem 1rem', // Larger padding for premium feel
+                        fontSize: '1rem',
+                        border: isFocused ? '1px solid var(--primary)' : '1px solid #e2e8f0',
+                        borderRadius: '12px', // Curved corners
+                        outline: 'none',
+                        transition: 'all 0.2s',
+                        color: '#1f2937',
+                        backgroundColor: '#fff',
+                        boxShadow: isFocused ? '0 0 0 3px rgba(128, 0, 0, 0.1)' : 'none'
+                    }}
                 />
-                {label && (
-                    <label
-                        htmlFor={id}
-                        style={{
-                            position: 'absolute',
-                            left: Icon ? '40px' : '1rem',
-                            top: isFocused || hasValue ? '0' : '50%',
-                            transform: isFocused || hasValue ? 'translateY(-26px)' : 'translateY(-50%)',
-                            background: isFocused || hasValue ? 'transparent' : 'transparent',
-                            fontSize: isFocused || hasValue ? '0.875rem' : '1rem',
-                            color: isFocused ? 'var(--primary)' : 'var(--text-muted)',
-                            pointerEvents: 'none',
-                            transition: 'all 0.2s ease',
-                            fontWeight: isFocused || hasValue ? '600' : '400'
-                        }}
-                    >
-                        {label}
-                        {required && <span style={{ color: 'var(--error)', marginLeft: '4px' }}>*</span>}
-                    </label>
-                )}
             </div>
         </div>
     );

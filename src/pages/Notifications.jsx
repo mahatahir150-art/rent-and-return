@@ -1,55 +1,54 @@
-import { Bell, MessageCircle, Clock, CheckCircle, AlertTriangle } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Bell, MessageCircle } from 'lucide-react';
+import { realtimeDb as db, auth } from '../config/firebase';
+import { ref, onValue } from 'firebase/database';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const Notifications = () => {
-    // Mock Notifications
-    const notifications = [
-        {
-            id: 1,
-            type: 'message',
-            title: 'New Message from Renter',
-            description: 'Hi, is this camera still available for this weekend?',
-            time: '2 mins ago',
-            read: false,
-            icon: MessageCircle,
-            color: '#3b82f6',
-            bg: '#eff6ff'
-        },
-        {
-            id: 2,
-            type: 'warning',
-            title: 'Return Date Approaching',
-            description: 'The Canon DSLR is due for return tomorrow by 5:00 PM.',
-            time: '1 hour ago',
-            read: false,
-            icon: Clock,
-            color: '#f59e0b',
-            bg: '#fffbeb'
-        },
-        {
-            id: 3,
-            type: 'success',
-            title: 'Payment Received',
-            description: 'You received $50.00 for the Electric Scooter rental.',
-            time: '1 day ago',
-            read: true,
-            icon: CheckCircle,
-            color: '#10b981',
-            bg: '#ecfdf5'
-        },
-        {
-            id: 4,
-            type: 'alert',
-            title: 'Security Deposit Refunded',
-            description: 'The $200 security deposit has been refunded to your card.',
-            time: '3 days ago',
-            read: true,
-            icon: ShieldCheck, // Wait, ShieldCheck is not imported explicitly here but available via... wait I need to import it.
-            // Actually I'll use CheckCircle or AlertTriangle
-            icon: CheckCircle,
-            color: '#64748b',
-            bg: '#f8fafc'
-        }
-    ];
+    const [notifications, setNotifications] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const notifRef = ref(db, `notifications/${user.uid}`);
+                const unsubscribeDb = onValue(notifRef, (snapshot) => {
+                    if (snapshot.exists()) {
+                        const data = snapshot.val();
+                        // Convert object to array and reverse logic for newest first
+                        const notifList = Object.keys(data).map(key => ({
+                            id: key,
+                            ...data[key],
+                            icon: MessageCircle, // Default icon
+                            bg: '#eff6ff',
+                            color: '#3b82f6'
+                        })).reverse();
+                        setNotifications(notifList);
+                    } else {
+                        setNotifications([]);
+                    }
+                    setLoading(false);
+                });
+                return () => unsubscribeDb();
+            } else {
+                setNotifications([]);
+                setLoading(false);
+            }
+        });
+        return () => unsubscribeAuth();
+    }, []);
+
+    if (loading) return <div style={{ padding: '2rem', textAlign: 'center' }}>Loading notifications...</div>;
+
+    if (notifications.length === 0) {
+        return (
+            <div style={{ maxWidth: '600px', margin: '0 auto', textAlign: 'center', padding: '3rem' }}>
+                <Bell size={48} color="var(--text-muted)" style={{ marginBottom: '1rem', opacity: 0.5 }} />
+                <h3>No Notifications</h3>
+                <p style={{ color: 'var(--text-muted)' }}>You're all caught up!</p>
+            </div>
+        );
+    }
 
     return (
         <div style={{ maxWidth: '600px', margin: '0 auto' }}>
@@ -87,7 +86,9 @@ const Notifications = () => {
                         <div style={{ flex: 1 }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '0.25rem' }}>
                                 <h3 style={{ fontSize: '1rem', fontWeight: notification.read ? '600' : '700' }}>{notification.title}</h3>
-                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>{notification.time}</span>
+                                <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>
+                                    {notification.time ? new Date(notification.time).toLocaleString() : ''}
+                                </span>
                             </div>
                             <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem' }}>{notification.description}</p>
                         </div>
@@ -97,13 +98,5 @@ const Notifications = () => {
         </div>
     );
 };
-// I missed ShieldCheck import
-import { ShieldCheck } from 'lucide-react';
-// Re-doing the export to be safe and clean.
-// Actually checking my code above, I used notification.icon which refers to the object property.
-// Object 4 uses CheckCircle now.
-// So I don't need ShieldCheck import for Object 4.
-// But Object 4 description says "Security Deposit". I'll use Lock or something?
-// I'll stuck to CheckCircle as decided.
 
 export default Notifications;

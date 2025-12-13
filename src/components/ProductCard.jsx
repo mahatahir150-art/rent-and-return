@@ -1,62 +1,72 @@
 import { MapPin, Star } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { motion } from 'framer-motion';
+import { useGlobal } from '../context/GlobalContext';
 
 const ProductCard = ({ product }) => {
+    const { formatPrice } = useGlobal();
+
     return (
-        <Link
-            to={`/dashboard/product/${product.id}`}
-            className="card"
-            style={{
-                padding: '0',
-                overflow: 'hidden',
-                height: '100%',
-                display: 'flex',
-                flexDirection: 'column',
-                textDecoration: 'none',
-                color: 'inherit'
-            }}
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+            whileHover={{ y: -8 }}
+            className="product-card-wrapper"
         >
-            <div style={{ height: '200px', backgroundColor: '#e2e8f0', position: 'relative' }}>
-                <img
-                    src={product.image}
-                    alt={product.name}
-                    style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                    onError={(e) => { e.target.style.display = 'none' }}
-                />
-                <div style={{
-                    position: 'absolute',
-                    top: '0.5rem',
-                    right: '0.5rem',
-                    background: 'rgba(255, 255, 255, 0.9)',
-                    padding: '0.25rem 0.5rem',
-                    borderRadius: 'var(--radius-sm)',
-                    fontSize: '0.75rem',
-                    fontWeight: 'bold',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.25rem'
-                }}>
-                    <Star size={12} fill="#f59e0b" color="#f59e0b" />
-                    {product.rating}
-                </div>
-            </div>
+            <Link
+                to={`/dashboard/product/${product.id}`}
+                className="product-card glass-card"
+                style={{ cursor: 'pointer', display: 'flex', flexDirection: 'column', height: '100%', textDecoration: 'none' }}
+                onClick={(e) => {
+                    // e.stopPropagation(); // Just in case, though Link usually handles it
+                }}
+            >
+                {/* Image Container */}
+                <div className="product-image-container">
+                    <div className="hover-overlay" />
+                    <motion.img
+                        src={product.image}
+                        alt={product.name}
+                        className="product-image"
+                        whileHover={{ scale: 1.05 }}
+                        transition={{ duration: 0.4 }}
+                        onError={(e) => { e.target.style.display = 'none' }}
+                    />
 
-            <div style={{ padding: '1rem', flex: 1, display: 'flex', flexDirection: 'column' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start', marginBottom: '0.5rem' }}>
-                    <h3 style={{ fontSize: '1.125rem', marginBottom: '0' }}>{product.name}</h3>
-                    <span style={{ fontWeight: 'bold', color: 'var(--primary)' }}>${product.price}/day</span>
+                    {/* Rating Badge */}
+                    <div className="rating-badge">
+                        <Star size={12} fill="#F59E0B" color="#F59E0B" />
+                        {product.rating}
+                    </div>
                 </div>
 
-                <p style={{ color: 'var(--text-muted)', fontSize: '0.875rem', marginBottom: '1rem', flex: 1 }}>
-                    {product.description}
-                </p>
+                {/* Content */}
+                <div className="product-content">
+                    <div className="product-header">
+                        <h3 className="product-title">{product.name}</h3>
+                    </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: 'auto', color: 'var(--text-muted)', fontSize: '0.75rem' }}>
-                    <MapPin size={14} />
-                    <span>{product.distance} away</span>
+                    <p className="product-description">
+                        {product.description}
+                    </p>
+
+                    <div className="product-footer">
+                        <div>
+                            <span className="price-label">Daily Rate</span>
+                            <div className="price-value">
+                                {formatPrice(product.price)}
+                            </div>
+                        </div>
+
+                        <div className="distance-badge">
+                            <MapPin size={12} />
+                            <span>{product.distance}</span>
+                        </div>
+                    </div>
                 </div>
-            </div>
-        </Link>
+            </Link>
+        </motion.div>
     );
 };
 
