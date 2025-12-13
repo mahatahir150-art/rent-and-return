@@ -127,14 +127,23 @@ const LandingPage = () => {
                     From high-end cameras to luxury cars, rent verified items securely.
                 </p>
 
-                <div className="animate-slide-up-delay hero-buttons" style={{ animationDelay: '0.4s', display: 'flex', gap: '1rem' }}>
+                <div className="animate-slide-up-delay hero-buttons" style={{
+                    animationDelay: '0.4s',
+                    display: 'flex',
+                    flexDirection: isMobile ? 'column' : 'row',
+                    gap: isMobile ? '0.75rem' : '1rem',
+                    width: isMobile ? '100%' : 'auto',
+                    padding: isMobile ? '0 2rem' : '0',
+                    justifyContent: 'center'
+                }}>
                     <Button
                         onClick={() => navigate('/signup')}
                         style={{
-                            padding: '0.8rem 2.5rem',
-                            fontSize: '1rem',
+                            padding: isMobile ? '0.6rem 1.5rem' : '0.8rem 2.5rem',
+                            fontSize: isMobile ? '0.9rem' : '1rem',
                             borderRadius: 'var(--radius-pill)',
-                            boxShadow: 'var(--shadow-md)'
+                            boxShadow: 'var(--shadow-md)',
+                            width: isMobile ? '100%' : 'auto'
                         }}
                     >
                         Start Renting Now <ArrowRight size={18} style={{ marginLeft: '8px' }} />
@@ -142,11 +151,12 @@ const LandingPage = () => {
                     <Button
                         variant="outline"
                         style={{
-                            padding: '0.8rem 2.5rem',
-                            fontSize: '1rem',
+                            padding: isMobile ? '0.6rem 1.5rem' : '0.8rem 2.5rem',
+                            fontSize: isMobile ? '0.9rem' : '1rem',
                             borderRadius: 'var(--radius-pill)',
                             borderColor: 'var(--primary)',
-                            color: 'var(--primary)'
+                            color: 'var(--primary)',
+                            width: isMobile ? '100%' : 'auto'
                         }}
                     >
                         Learn More
