@@ -1,9 +1,18 @@
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Button from '../components/Button';
-import { ArrowRight, Package, ShieldCheck, Zap, Users, Star } from 'lucide-react';
+import { ArrowRight, Package, ShieldCheck, Zap, Users, Star, Mail, MapPin, Phone } from 'lucide-react';
+import Input from '../components/Input';
 
 const LandingPage = () => {
     const navigate = useNavigate();
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+
+    useEffect(() => {
+        const handleResize = () => setIsMobile(window.innerWidth <= 768);
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
 
     return (
         <div style={{
@@ -17,8 +26,8 @@ const LandingPage = () => {
         }}>
             {/* Header / Nav */}
             <header className="glass-panel" style={{
-                margin: '1.5rem 3rem',
-                padding: '1rem 2rem',
+                margin: isMobile ? '1rem' : '1.5rem 3rem',
+                padding: isMobile ? '0.75rem 1rem' : '1rem 2rem',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
@@ -29,19 +38,19 @@ const LandingPage = () => {
                 border: '1px solid rgba(128, 0, 0, 0.05)',
                 background: 'rgba(255, 255, 255, 0.8)'
             }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 'bold', fontSize: '1.5rem', color: 'var(--primary)' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', fontWeight: 'bold', fontSize: isMobile ? '1.1rem' : '1.5rem', color: 'var(--primary)' }}>
                     <div style={{
                         background: 'var(--primary)',
-                        padding: '8px',
-                        borderRadius: '12px',
+                        padding: '6px',
+                        borderRadius: '10px',
                         display: 'flex',
                         boxShadow: 'var(--shadow-sm)'
                     }}>
-                        <Package size={24} color="white" />
+                        <Package size={isMobile ? 18 : 24} color="white" />
                     </div>
                     <span>Rent & Return</span>
                 </div>
-                <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+                <div style={{ display: 'flex', gap: isMobile ? '0.5rem' : '1rem', alignItems: 'center' }}>
                     <button
                         onClick={() => navigate('/login')}
                         style={{
@@ -49,14 +58,22 @@ const LandingPage = () => {
                             border: 'none',
                             color: 'var(--text-main)',
                             fontWeight: '600',
-                            fontSize: '1rem',
+                            fontSize: isMobile ? '0.9rem' : '1rem',
                             cursor: 'pointer',
-                            padding: '0.5rem 1rem'
+                            padding: '0.5rem'
                         }}
                     >
                         Login
                     </button>
-                    <Button onClick={() => navigate('/signup')} style={{ borderRadius: 'var(--radius-pill)', boxShadow: 'var(--shadow-md)' }}>
+                    <Button
+                        onClick={() => navigate('/signup')}
+                        style={{
+                            borderRadius: 'var(--radius-pill)',
+                            boxShadow: 'var(--shadow-md)',
+                            padding: isMobile ? '0.6rem 1rem' : '0.75rem 1.5rem',
+                            fontSize: isMobile ? '0.9rem' : '1rem'
+                        }}
+                    >
                         Get Started
                     </Button>
                 </div>
@@ -110,23 +127,23 @@ const LandingPage = () => {
                     From high-end cameras to luxury cars, rent verified items securely.
                 </p>
 
-                <div className="animate-slide-up-delay hero-buttons" style={{ animationDelay: '0.4s', display: 'flex', gap: '1.5rem' }}>
+                <div className="animate-slide-up-delay hero-buttons" style={{ animationDelay: '0.4s', display: 'flex', gap: '1rem' }}>
                     <Button
                         onClick={() => navigate('/signup')}
                         style={{
-                            padding: '1.25rem 3rem',
-                            fontSize: '1.1rem',
+                            padding: '0.8rem 2.5rem',
+                            fontSize: '1rem',
                             borderRadius: 'var(--radius-pill)',
                             boxShadow: 'var(--shadow-md)'
                         }}
                     >
-                        Start Renting Now <ArrowRight size={20} style={{ marginLeft: '10px' }} />
+                        Start Renting Now <ArrowRight size={18} style={{ marginLeft: '8px' }} />
                     </Button>
                     <Button
                         variant="outline"
                         style={{
-                            padding: '1.25rem 3rem',
-                            fontSize: '1.1rem',
+                            padding: '0.8rem 2.5rem',
+                            fontSize: '1rem',
                             borderRadius: 'var(--radius-pill)',
                             borderColor: 'var(--primary)',
                             color: 'var(--primary)'
@@ -184,6 +201,68 @@ const LandingPage = () => {
                     ))}
                 </div>
             </section>
+
+            {/* Maroon Footer Section */}
+            <footer style={{
+                background: 'var(--primary-hover)', // Deep Maroon background
+                color: 'white',
+                padding: '4rem 2rem',
+                position: 'relative',
+                zIndex: 10
+            }}>
+                <div className="container" style={{ maxWidth: '1200px', margin: '0 auto' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.5fr 1fr 1fr', gap: '3rem' }}>
+
+                        {/* Column 1: About Us / Branding */}
+                        <div>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem', fontSize: '1.5rem', fontWeight: 'bold', color: 'var(--secondary)' }}>
+                                <span>About Us</span>
+                            </div>
+                            <p style={{ lineHeight: '1.6', color: 'white', maxWidth: '350px' }}>
+                                Rent & Return is Pakistan's premier peer-to-peer rental marketplace.
+                                We connect people to rent luxury items securely and affordably.
+                                Experience the freedom of access over ownership.
+                            </p>
+                        </div>
+
+                        {/* Column 2: Quick Links */}
+                        <div>
+                            <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', fontWeight: 'bold', color: 'var(--secondary)' }}>Quick Links</h3>
+                            <ul style={{ listStyle: 'none', padding: 0, margin: 0, display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                                {['Home', 'Search', 'How it Works', 'Safety', 'Terms of Service', 'Privacy Policy'].map((link) => (
+                                    <li key={link}>
+                                        <a href="#" style={{ color: 'white', textDecoration: 'none', opacity: 0.8, transition: 'opacity 0.2s' }}
+                                            onMouseOver={(e) => e.target.style.opacity = '1'}
+                                            onMouseOut={(e) => e.target.style.opacity = '0.8'}>
+                                            {link}
+                                        </a>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+
+                        {/* Column 3: Contact Us */}
+                        <div>
+                            <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', fontWeight: 'bold', color: 'var(--secondary)' }}>Contact Us</h3>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                    <Mail size={18} />
+                                    <span style={{ opacity: 0.9 }}>rentandreturn.help@gmail.com</span>
+                                </div>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
+                                    <MapPin size={18} />
+                                    <span style={{ opacity: 0.9 }}>Lahore, Pakistan</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Copyright Line */}
+                    <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', marginTop: '3rem', paddingTop: '1.5rem', textAlign: 'center', opacity: 0.6, fontSize: '0.9rem' }}>
+                        © 2025 Rent & Return. All rights reserved.
+                    </div>
+                </div>
+            </footer>
         </div>
     );
 };

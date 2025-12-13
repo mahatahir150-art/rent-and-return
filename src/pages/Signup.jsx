@@ -32,16 +32,6 @@ const Signup = () => {
         setError('');
     };
 
-    const handleAutoFill = () => {
-        // Mock auto-fill for testing convenience
-        setFormData({
-            fullName: 'Test User',
-            email: `test${Math.floor(Math.random() * 1000)}@example.com`,
-            phone: '+923001234567',
-            password: 'Test@123'
-        });
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
@@ -127,12 +117,6 @@ const Signup = () => {
                 {step === 1 ? (
                     /* FORM STEP */
                     <>
-                        <div style={{ marginBottom: '1.5rem' }}>
-                            <Button variant="outline" onClick={handleAutoFill} icon={Camera}>
-                                Auto-fill (Test)
-                            </Button>
-                        </div>
-
                         <form onSubmit={handleSubmit}>
                             {error && (
                                 <div style={{
@@ -198,8 +182,8 @@ const Signup = () => {
                         </Link>
                     </p>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

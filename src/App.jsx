@@ -15,7 +15,6 @@ import { Toaster } from 'react-hot-toast';
 const NotFound = () => <div className="container" style={{ padding: '2rem' }}><h1>404 Not Found</h1></div>;
 
 function App() {
-  console.log("App.jsx: Rendering..."); // DEBUG
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -58,8 +57,6 @@ function App() {
             }
           }}
         />
-        { /* TEST RENDER */}
-        <div style={{ position: 'absolute', top: 0, left: 0, zIndex: 9999, fontSize: 10, opacity: 0.5 }}>VFE Rendered</div>
         <ErrorBoundary>
           <Suspense fallback={<SplashScreen />}>
             <Routes>
