@@ -18,33 +18,58 @@ export const GlobalProvider = ({ children }) => {
     useEffect(() => {
         const detectLocation = async () => {
             try {
-                // Background fetch, do not block UI with set loading true
-                // Using ipapi.co for free IP location
+                // 1. IP-based detection for Currency/Country (Metadata)
                 const response = await axios.get('https://ipapi.co/json/');
                 const data = response.data;
-                const userCountry = data.country_code; // e.g., 'PK', 'US'
+                const userCountry = data.country_code;
 
                 setCountry(userCountry);
 
                 if (userCountry === 'PK') {
                     setCurrency('PKR');
-                    // i18n.changeLanguage('ur'); // Optional: Keep English default for consistency
                 } else if (['ES', 'MX', 'AR'].includes(userCountry)) {
                     i18n.changeLanguage('es');
                     setCurrency(data.currency || 'USD');
                 } else {
-                    // For MVP, prefer PKR if uncertain, or stick to detected currency
-                    // But to fix user issue, we prioritize PKR if they are in PK or if standard
                     setCurrency(data.currency || 'USD');
+                }
+
+                // 2. Precise Geolocation for "Item Request" Radius feature
+                // We need to save this to Firebase if the user is logged in
+                const { auth } = await import('../config/firebase');
+                const user = auth.currentUser;
+
+                if (user) {
+                    try {
+                        const { getLocationWithAddress } = await import('../utils/locationUtils');
+                        const locationData = await getLocationWithAddress();
+
+                        if (locationData && locationData.latitude && locationData.longitude) {
+                            const { realtimeDb: db } = await import('../config/firebase');
+                            const { ref, update } = await import('firebase/database');
+
+                            // Update user location in DB
+                            await update(ref(db, `users/${user.uid}`), {
+                                location: {
+                                    lat: locationData.latitude,
+                                    lng: locationData.longitude,
+                                    address: locationData.formattedAddress,
+                                    updatedAt: new Date().toISOString()
+                                }
+                            });
+                            console.log("User location updated in Firebase");
+                        }
+                    } catch (geoError) {
+                        console.log("Geolocation permission denied or ignored:", geoError);
+                        // Non-blocking, user might have denied permission
+                    }
                 }
 
             } catch (error) {
                 console.error("Error detecting location:", error);
-                // Fallback already set (PKR)
-            } finally {
-                // setLoading(false); // No longer needed as we don't start with loading=true
             }
         };
+
         // Small delay to prioritize main thread for rendering
         const timer = setTimeout(() => {
             detectLocation();

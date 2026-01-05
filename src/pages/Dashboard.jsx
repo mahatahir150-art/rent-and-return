@@ -18,6 +18,7 @@ const BankingSetup = lazy(() => import('./BankingSetup'));
 const MyRentals = lazy(() => import('./MyRentals'));
 const MyListings = lazy(() => import('./MyListings'));
 const HelpSupport = lazy(() => import('./HelpSupport'));
+const Chat = lazy(() => import('./Chat'));
 
 // Placeholder Pages - Adjusted to remove internal Headers
 // Placeholder Pages - Adjusted to remove internal Headers
@@ -63,6 +64,7 @@ const Dashboard = () => {
         if (pathname.includes('/settings')) return 'Settings';
         if (pathname.includes('/help')) return 'Help & Support';
         if (pathname.includes('/product/')) return 'Product Details';
+        if (pathname.includes('/chat')) return 'Messages';
         return 'Dashboard';
     };
 
@@ -168,7 +170,10 @@ const Dashboard = () => {
                             <Route path="banking-setup" element={<BankingSetup />} />
                             <Route path="profile" element={<Profile />} />
                             <Route path="settings" element={<Profile />} />
+                            <Route path="settings" element={<Profile />} />
                             <Route path="help" element={<HelpSupport />} />
+                            <Route path="chat" element={<Chat />} />
+                            <Route path="chat/:chatId" element={<Chat />} />
                             <Route path="*" element={<div>Route Not Found: {window.location.pathname}</div>} />
                         </Routes>
                     </Suspense>
